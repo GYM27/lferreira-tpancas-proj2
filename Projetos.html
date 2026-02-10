@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/projetos.css">
+    <script src="https://kit.fontawesome.com/d02d54555c.js" crossorigin="anonymous"></script>
+
+    <title>Projetos</title>
+</head>
+
+<body class="projetos-page">
+
+    <div id="header-placeholder"></div>
+
+    <main id="projetos-main">
+
+        <div id="aside-placeholder"></div>
+
+
+        <div id="mural">
+            <div class="page-card">
+                <section class="barra-welcome">
+                    <h3>Gestão de Projetos</h3>
+                    <div class="botao-acao">
+                        <button class="button-edit-objects" data-acao="criar" data-tooltip="Criar novo Projeto"><i
+                                class="fa-solid fa-plus"></i></button>
+                    </div>
+                </section>
+
+                <div id="box-lista">
+                    <table id="tabela">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Cliente</th>
+                                <th>Estado</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabela">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="JS/geral.js"></script>
+    <script src="JS/projetos.js"></script>
+
+    <script>
+        loadHeader();
+        loadAside();
+        loadFooter();
+    </script>
+
+</body>
+
+</html>

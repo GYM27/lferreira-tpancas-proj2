@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="CSS/style.css">
+  <link rel="stylesheet" href="CSS/tarefas.css">
+  <script src="https://kit.fontawesome.com/d02d54555c.js" crossorigin="anonymous"></script>
+  <title>Tarefas</title>
+</head>
+
+<body class="tarefas-page">
+
+  <div id="header-placeholder"></div>
+
+  <main id="tarefas-main">
+
+    <div id="aside-placeholder"></div>
+
+    <div id="mural">
+      <div class="page-card">
+        <div class="barra-welcome">
+          <h3>Gestão de Tarefas</h3>
+          <div class="barra-acoes"><label for="filtroEstado">Filtrar por Estado:</label>
+            <select id="filtroEstado">
+              <option value="Todas">Todas</option>
+              <option value="Novas">Novas</option>
+              <option value="Em Curso">Em Curso</option>
+              <option value="Concluídas">Concluídas</option>
+            </select>
+            <div class="btn-acao">
+              <button class="button-edit-objects" data-acao="criar" data-tooltip="Criar nova Tarefa"><i
+                  class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
+        </div>
+        <div id="formTarefa" class="form-hidden">
+
+          <div class="form-container">
+            <h3>Nova Tarefa</h3>
+
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" placeholder="Título da Tarefa">
+
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" placeholder="Descrição da Tarefa">
+
+            <label for="estado">Estado:</label>
+            <select id="estado">
+              <option value="Novas">Novas</option>
+              <option value="Em Curso">Em Curso</option>
+              <option value="Concluídas">Concluídas</option>
+            </select>
+
+            <div class="form-botoes">
+              <button id="guardarTarefa">
+                <i class="fa-solid fa-floppy-disk"></i>
+              </button>
+              <button id="cancelarTarefa">
+                <i class="fa-solid fa-ban"></i>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div id="lista-container">
+
+          <table id="tabela">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Descrição</th>
+                <th>Estado</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="JS/geral.js"></script>
+  <script src="JS/tarefas.js"></script>
+
+  <script>
+    loadHeader();
+    loadAside();
+    loadFooter();
+  </script>
+
+</body>
+
+</html>
