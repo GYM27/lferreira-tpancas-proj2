@@ -9,7 +9,7 @@ function loadHeader() {
 }
 
 function atualizarSaudacao() {
-  const nome = localStorage.getItem("nomeUser");
+  const nome = localStorage.getItem("userName");
 
   if (nome) {
     document.getElementById("saudacao").innerText = `Olá, ${nome}!`;
@@ -72,3 +72,20 @@ function getIdCliente(id) {
     return cliente.id === id;
   });
 }
+
+function fazerLogin() {
+
+  const nome = document.getElementById("username").value;
+
+  localStorage.setItem("userName", nome);
+
+  window.location.href = "Dashboard.html";
+}
+
+function logout() {
+
+  localStorage.removeItem("userName");
+
+  window.location.href = "Login.html";
+}
+

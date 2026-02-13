@@ -89,7 +89,7 @@ function abrirFormulario() {
     if (indexEditando !== -1) {
         const p = projetos[indexEditando];
         document.getElementById('input-nome').value = p.nome;
-        document.getElementById('input-cliente').value = p.cliente.getIdCliente(id);
+        document.getElementById('input-cliente').value = p.cliente;
         document.getElementById('input-estado').value = p.estado; // Seleciona automaticamente
         document.getElementById('input-data-inicio').value = p.dataInicio;
         document.getElementById('input-data-fim').value = p.dataFim;
