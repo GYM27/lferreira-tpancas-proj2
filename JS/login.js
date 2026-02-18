@@ -72,40 +72,94 @@ function mostrarLogin() {
     };
 }
 
-function fazerLogin() {
-    const nome = document.getElementById("username").value.trim();
-    const senha = document.getElementById("password").value.trim();
+async function fazerLogin() {
 
-    // Verificação manual de segurança
-    if (nome === "" || senha === "") {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return; // Impede a execução do resto da função
-    }
+    const BASE_URL = 'http://localhost:8080/lferreira-tpancas-proj2/rest/users';
 
-    // Se houver dados, guarda o nome e avança
-    localStorage.setItem("userName", nome);
-    window.location.href = "Dashboard.html";
-}
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-function fazerRegisto() {
-    const dadosregisto = {
-        nome: document.getElementById("reg-username").value,
-        senha: document.getElementById("reg-password").value,
-        email: document.getElementById("reg-email").value,
-        primeiroNome: document.getElementById("reg-firstname").value,
-        ultimoNome: document.getElementById("reg-lastname").value,
-        telefone: document.getElementById("reg-phone").value
-    };
-
-    // Correção: Aceder às propriedades de 'dadosregisto'
-    if (dadosregisto.nome === "" || dadosregisto.email === "" || dadosregisto.primeiroNome === "" || dadosregisto.ultimoNome === "" || dadosregisto.telefone === "" || dadosregisto.senha === "") {
+    if (username === "" || password === "") {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
 
-    // Guardar o primeiro nome para a saudação no Dashboard
-    localStorage.setItem("userName", dadosregisto.primeiroNome);
+    try {
+        const response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
 
-    alert(`Bem-vindo, ${dadosregisto.primeiroNome}! Conta criada com sucesso!`);
-    window.location.href = "Dashboard.html";
+        if (response.status === 200) {
+
+            const data = await response.json();
+            console.log("Login bem-sucedido:", data);
+
+            // Guardar apenas o necessário
+            localStorage.setItem("userName", username);
+
+            // Redirecionar
+            window.location.href = "Dashboard.html";
+
+        } else if (response.status === 401) {
+
+            alert("Utilizador ou palavra-passe incorretos.");
+
+        } else {
+
+            alert("Erro inesperado no servidor.");
+
+        }
+
+    } catch (error) {
+
+        console.error("Erro na ligação ao servidor:", error);
+        alert("Servidor indisponível no momento.");
+
+    }
+}
+
+
+async function fazerRegisto() {
+    // Mapeamento exato dos campos para o UserPojo.java do backend
+    const dadosRegisto = {
+        username: document.getElementById("reg-username").value.trim(),
+        password: document.getElementById("reg-password").value.trim(),
+        email: document.getElementById("reg-email").value.trim(),
+        firstName: document.getElementById("reg-firstname").value.trim(),
+        lastName: document.getElementById("reg-lastname").value.trim(),
+        cellphone: document.getElementById("reg-phone").value.trim()
+    };
+
+    if (Object.values(dadosRegisto).some(v => v === "")) {
+        alert("Preencha todos os campos.");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosRegisto)
+        });
+
+        if (response.ok) {
+            // Após registo, guardamos credenciais e entramos
+            localStorage.setItem("userName", dadosRegisto.username);
+            localStorage.setItem("userPass", dadosRegisto.password);
+            alert(`Bem-vindo, ${dadosRegisto.firstName}!`);
+            window.location.href = "Dashboard.html";
+        } else {
+            const erro = await response.json();
+            alert(erro.error || "Erro ao criar conta.");
+        }
+    } catch (error) {
+        console.error("Erro no registo:", error);
+    }
 }
