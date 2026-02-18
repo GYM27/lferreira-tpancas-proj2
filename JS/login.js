@@ -75,56 +75,35 @@ function mostrarLogin() {
 async function fazerLogin() {
 
     const BASE_URL = 'http://localhost:8080/lferreira-tpancas-proj2/rest/users';
+    
+    const nome = document.getElementById("username").value.trim();
+    const senha = document.getElementById("password").value.trim();
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (username === "" || password === "") {
+    if (nome === "" || senha === "") {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/login`, {
+        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: nome, password: senha })
         });
 
-        if (response.status === 200) {
-
-            const data = await response.json();
-            console.log("Login bem-sucedido:", data);
-
-            // Guardar apenas o necessário
-            localStorage.setItem("userName", username);
-
-            // Redirecionar
+        if (response.ok) {
+            // Guardamos o username e a password para autenticação nos outros serviços
+            localStorage.setItem("userName", nome);
+            localStorage.setItem("userPass", senha); 
             window.location.href = "Dashboard.html";
-
-        } else if (response.status === 401) {
-
-            alert("Utilizador ou palavra-passe incorretos.");
-
         } else {
-
-            alert("Erro inesperado no servidor.");
-
+            alert("Utilizador ou palavra-passe incorretos.");
         }
-
     } catch (error) {
-
         console.error("Erro na ligação ao servidor:", error);
         alert("Servidor indisponível no momento.");
-
     }
 }
-
 
 async function fazerRegisto() {
     // Mapeamento exato dos campos para o UserPojo.java do backend
