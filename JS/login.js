@@ -74,8 +74,6 @@ function mostrarLogin() {
 
 async function fazerLogin() {
 
-    const BASE_URL = 'http://localhost:8080/lferreira-tpancas-proj2/rest/users';
-    
     const nome = document.getElementById("username").value.trim();
     const senha = document.getElementById("password").value.trim();
 
@@ -85,28 +83,36 @@ async function fazerLogin() {
     }
 
     try {
-        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: nome, password: senha })
-        });
+        const response = await fetch(
+            'http://localhost:8080/lferreira-tpancas-proj2/rest/users/login',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: nome,
+                    password: senha
+                })
+            }
+        );
 
         if (response.ok) {
-            // Guardamos o username e a password para autenticação nos outros serviços
+            //Guardamos apenas o username
             localStorage.setItem("userName", nome);
-            localStorage.setItem("userPass", senha); 
+
             window.location.href = "Dashboard.html";
         } else {
             alert("Utilizador ou palavra-passe incorretos.");
         }
+
     } catch (error) {
         console.error("Erro na ligação ao servidor:", error);
         alert("Servidor indisponível no momento.");
     }
 }
 
+
 async function fazerRegisto() {
-    // Mapeamento exato dos campos para o UserPojo.java do backend
+
     const dadosRegisto = {
         username: document.getElementById("reg-username").value.trim(),
         password: document.getElementById("reg-password").value.trim(),
@@ -122,23 +128,28 @@ async function fazerRegisto() {
     }
 
     try {
-        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dadosRegisto)
-        });
+        const response = await fetch(
+            'http://localhost:8080/lferreira-tpancas-proj2/rest/users/register',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosRegisto)
+            }
+        );
 
         if (response.ok) {
-            // Após registo, guardamos credenciais e entramos
+            //Guardamos apenas o username
             localStorage.setItem("userName", dadosRegisto.username);
-            localStorage.setItem("userPass", dadosRegisto.password);
+
             alert(`Bem-vindo, ${dadosRegisto.firstName}!`);
             window.location.href = "Dashboard.html";
         } else {
             const erro = await response.json();
             alert(erro.error || "Erro ao criar conta.");
         }
+
     } catch (error) {
         console.error("Erro no registo:", error);
+        alert("Erro de ligação ao servidor.");
     }
 }

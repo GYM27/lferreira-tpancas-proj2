@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3aed9ea2-53b6-47ae-87ce-1ce9d04b7f4e" name="Changes" comment="Integracao de login e registo  com backend">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/lferreira-tpancas-proj2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JS/geral.js" beforeDir="false" afterPath="$PROJECT_DIR$/JS/geral.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JS/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/JS/login.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +51,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "nodejs_package_manager_path": "npm",
@@ -93,6 +90,8 @@
       <workItem from="1771416296064" duration="608000" />
       <workItem from="1771424692944" duration="4807000" />
       <workItem from="1771435458437" duration="264000" />
+      <workItem from="1771435731461" duration="1236000" />
+      <workItem from="1771494797232" duration="1209000" />
     </task>
     <task id="LOCAL-00001" summary="Integracao de login e registo  com backend">
       <option name="closed" value="true" />
