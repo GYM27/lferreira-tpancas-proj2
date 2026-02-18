@@ -73,19 +73,13 @@ function getIdCliente(id) {
   });
 }
 
-function fazerLogin() {
-
-  const nome = document.getElementById("username").value;
-
-  localStorage.setItem("userName", nome);
-
-  window.location.href = "Dashboard.html";
-}
 
 function logout() {
+    // Apaga todos os dados guardados em ambos os tipos de armazenamento local
+    localStorage.clear();
+    sessionStorage.clear();
 
-  localStorage.removeItem("userName");
-
-  window.location.href = "Login.html";
+    // Redireciona o utilizador de volta para a página de login
+    window.location.href = "Login.html";
 }
 
