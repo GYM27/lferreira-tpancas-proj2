@@ -1,0 +1,138 @@
+Index: JS/geral.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>function loadHeader() {\r\n  fetch(\"header.html\")\r\n    .then(response => response.text())\r\n    .then(html => {\r\n      document.getElementById(\"header-placeholder\").innerHTML = html;\r\n\r\n      atualizarSaudacao();\r\n    });\r\n}\r\n\r\nfunction atualizarSaudacao() {\r\n  const nome = localStorage.getItem(\"userName\");\r\n\r\n  if (nome) {\r\n    document.getElementById(\"saudacao\").innerText = `Olá, ${nome}!`;\r\n  }\r\n}\r\n\r\nfunction loadFooter() {\r\n  fetch(\"footer.html\")\r\n    .then(response => response.text())\r\n    .then(html => {\r\n      document.getElementById(\"footer-placeholder\").innerHTML = html;\r\n    });\r\n}\r\n\r\nfunction loadAside() {\r\n  fetch(\"aside.html\")\r\n    .then(response => response.text())\r\n    .then(html => {\r\n      document.getElementById(\"aside-placeholder\").innerHTML = html;\r\n    });\r\n}\r\n\r\nfunction removerItem(index) {\r\n  // 1. Criamos o elemento do modal\r\n  const overlay = document.createElement('div');\r\n  overlay.className = 'modal-overlay';\r\n\r\n  overlay.innerHTML = `\r\n        <div class=\"modal-box\">\r\n            <h3>Confirmar Exclusão</h3>\r\n            <p>Tem a certeza de que deseja apagar?</p>\r\n            <div class=\"modal-buttons\">\r\n                <button id=\"btn-confirmar\">Sim, apagar!</button>\r\n                <button id=\"btn-cancelar\">Cancelar</button>\r\n            </div>\r\n        </div>\r\n    `;\r\n\r\n  document.body.appendChild(overlay);\r\n\r\n\r\n  // 2. Lógica do botão de confirmar\r\n  document.getElementById('btn-confirmar').onclick = function () {\r\n    projetos.splice(index, 1);\r\n    localStorage.setItem('box-lista', JSON.stringify(projetos));\r\n    document.body.removeChild(overlay); // Remove o modal\r\n    renderizarTabela(); // Atualiza a lista\r\n  };\r\n\r\n  // 3. Lógica do botão de cancelar\r\n  document.getElementById('btn-cancelar').onclick = function () {\r\n    document.body.removeChild(overlay); // Apenas fecha o modal\r\n  };\r\n}\r\n\r\nfunction getIdCliente(id) {\r\n\r\n  id = Number(id);\r\n  return meusClientes.find(function (cliente) {\r\n    return cliente.id === id;\r\n  });\r\n}\r\n\r\nfunction fazerLogin() {\r\n\r\n  const nome = document.getElementById(\"username\").value;\r\n\r\n  localStorage.setItem(\"userName\", nome);\r\n\r\n  window.location.href = \"Dashboard.html\";\r\n}\r\n\r\nfunction logout() {\r\n\r\n  localStorage.removeItem(\"userName\");\r\n\r\n  window.location.href = \"Login.html\";\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/JS/geral.js b/JS/geral.js
+--- a/JS/geral.js	(revision 452ce873ed00873b58d33a005f16c1260d4c5820)
++++ b/JS/geral.js	(date 1771426203451)
+@@ -75,17 +75,56 @@
+ 
+ function fazerLogin() {
+ 
+-  const nome = document.getElementById("username").value;
++  const username = document.getElementById("username").value.trim();
++  const password = document.getElementById("password").value.trim();
++
++  if (username === "" || password === ""){
++    alert("Preencha todos os campos.");
++    return;
++  }
+ 
+-  localStorage.setItem("userName", nome);
++  fetch("http://localhost:8080/lferreira-tpancas-proj2/rest/users/login"), {
++    method: "POST",
++    headers: {
++      "Contente-Type": "application/json"
++    },
++    body: JSON.stringify({
++      username: username,
++      password: password
++    })
++  }
++.then(response => {
++    if (response.ok) {
++      return response.json();
++    } else {
++      throw new Error("Credenciais inválidas");
++    }
++  })
++      .then(data => {
+ 
+-  window.location.href = "Dashboard.html";
++        // Guarda username na sessão
++        localStorage.setItem("username", username);
++
++        // Redireciona para dashboard
++        window.location.href = "Dashboard.html";
++      })
++      .catch(error => {
++        alert("Login falhou. Verifique as credenciais.");
++      });
+ }
+ 
+ function logout() {
+ 
+-  localStorage.removeItem("userName");
++  localStorage.removeItem("username");
++
++  window.location.href = "Login.html";
++}
+ 
+-  window.location.href = "Login.html";
++function verificarAutenticacao() {
++
++  const user = localStorage.getItem("username");
++
++  if (!user) {
++    window.location.href = "Login.html";
++  }
+ }
+-
+Index: JS/login.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// JS/login.js\r\n\r\nconst htmlLogin = `\r\n    <form id=\"login-form\">\r\n        <label class=\"login\" for=\"username\">Utilizador:</label>\r\n        <input type=\"text\" id=\"username\" name=\"username\" placeholder=\"Introduza o seu nome\" required>\r\n\r\n        <label class=\"login\" for=\"password\">Palavra-passe:</label>\r\n        <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Introduza a sua senha\" required>\r\n\r\n        <button type=\"submit\" class=\"botao\">ENTRAR</button>\r\n    </form>\r\n    <p>\r\n        Ainda não tem conta? <a href=\"javascript:void(0)\" onclick=\"mostrarRegisto()\">Registe-se aqui</a>\r\n    </p>\r\n`;\r\n\r\nconst htmlRegisto = `\r\n    <h2>Criar Nova Conta</h2>\r\n    <form id=\"register-form\">\r\n        <div>\r\n            <div>\r\n                <label for=\"reg-firstname\">Primeiro Nome</label>\r\n                <input type=\"text\" id=\"reg-firstname\" placeholder=\"Ex: João\" required>\r\n            </div>\r\n            <div style=\"flex: 1;\">\r\n                <label for=\"reg-lastname\">Apelido</label>\r\n                <input type=\"text\" id=\"reg-lastname\" placeholder=\"Ex: Silva\" required>\r\n            </div>\r\n        </div>\r\n\r\n        <label for=\"reg-username\">Nome de Utilizador (Username)</label>\r\n        <input type=\"text\" id=\"reg-username\" placeholder=\"Escolha um username\" required>\r\n\r\n        <label for=\"reg-email\">E-mail</label>\r\n        <input type=\"email\" id=\"reg-email\" placeholder=\"exemplo@bridge.com\" required>\r\n\r\n        <label for=\"reg-phone\">Telefone</label>\r\n        <input type=\"tel\" id=\"reg-phone\" placeholder=\"912 345 678\" required>\r\n\r\n        <label for=\"reg-password\">Palavra-passe</label>\r\n        <input type=\"password\" id=\"reg-password\" placeholder=\"Crie uma senha forte\" required>\r\n\r\n        <button type=\"submit\" class=\"botao\">REGISTAR</button>\r\n    </form>\r\n    <p>\r\n        Já tem conta? <a href=\"javascript:void(0)\" onclick=\"mostrarLogin()\" >Faça Login aqui</a>\r\n    </p>\r\n`;\r\n\r\n// Funções para trocar o conteúdo\r\nfunction mostrarRegisto() {\r\n    const box = document.querySelector(\".login-box\");\r\n    box.innerHTML = htmlRegisto;\r\n\r\n    // Captura o formulário assim que ele é injetado no HTML\r\n    const form = document.getElementById(\"register-form\");\r\n    form.onsubmit = function (event) {\r\n        event.preventDefault(); // Impede o recarregamento da página\r\n        fazerRegisto();        // Só chama a função se o navegador validar os campos\r\n    };\r\n}\r\n\r\nfunction mostrarLogin() {\r\n    const box = document.querySelector(\".login-box\");\r\n    box.innerHTML = htmlLogin;\r\n\r\n    const form = document.getElementById(\"login-form\");\r\n    form.onsubmit = function (event) {\r\n        event.preventDefault();\r\n        fazerLogin();\r\n    };\r\n}\r\n\r\nfunction fazerLogin() {\r\n    const nome = document.getElementById(\"username\").value.trim();\r\n    const senha = document.getElementById(\"password\").value.trim();\r\n\r\n    // Verificação manual de segurança\r\n    if (nome === \"\" || senha === \"\") {\r\n        alert(\"Por favor, preencha todos os campos obrigatórios.\");\r\n        return; // Impede a execução do resto da função\r\n    }\r\n\r\n    // Se houver dados, guarda o nome e avança\r\n    localStorage.setItem(\"userName\", nome);\r\n    window.location.href = \"Dashboard.html\";\r\n}\r\n\r\nfunction fazerRegisto() {\r\n    const dadosregisto = {\r\n        nome: document.getElementById(\"reg-username\").value,\r\n        senha: document.getElementById(\"reg-password\").value,\r\n        email: document.getElementById(\"reg-email\").value,\r\n        primeiroNome: document.getElementById(\"reg-firstname\").value,\r\n        ultimoNome: document.getElementById(\"reg-lastname\").value,\r\n        telefone: document.getElementById(\"reg-phone\").value\r\n    };\r\n\r\n    // Correção: Aceder às propriedades de 'dadosregisto'\r\n    if (dadosregisto.nome === \"\" || dadosregisto.email === \"\" || dadosregisto.primeiroNome === \"\" || dadosregisto.ultimoNome === \"\" || dadosregisto.telefone === \"\" || dadosregisto.senha === \"\") {\r\n        alert(\"Por favor, preencha todos os campos obrigatórios.\");\r\n        return;\r\n    }\r\n\r\n    // Guardar o primeiro nome para a saudação no Dashboard\r\n    localStorage.setItem(\"userName\", dadosregisto.primeiroNome);\r\n\r\n    alert(`Bem-vindo, ${dadosregisto.primeiroNome}! Conta criada com sucesso!`);\r\n    window.location.href = \"Dashboard.html\";\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/JS/login.js b/JS/login.js
+--- a/JS/login.js	(revision 452ce873ed00873b58d33a005f16c1260d4c5820)
++++ b/JS/login.js	(date 1771426080888)
+@@ -83,29 +83,34 @@
+     }
+ 
+     // Se houver dados, guarda o nome e avança
+-    localStorage.setItem("userName", nome);
++    localStorage.setItem("username", nome);
+     window.location.href = "Dashboard.html";
+ }
+ 
+ function fazerRegisto() {
+-    const dadosregisto = {
+-        nome: document.getElementById("reg-username").value,
+-        senha: document.getElementById("reg-password").value,
++
++    const novoUser = {
++        username: document.getElementById("reg-username").value,
++        password: document.getElementById("reg-password").value,
+         email: document.getElementById("reg-email").value,
+-        primeiroNome: document.getElementById("reg-firstname").value,
+-        ultimoNome: document.getElementById("reg-lastname").value,
+-        telefone: document.getElementById("reg-phone").value
++        firstName: document.getElementById("reg-firstname").value,
++        lastName: document.getElementById("reg-lastname").value,
++        cellphone: document.getElementById("reg-phone").value
+     };
+ 
+-    // Correção: Aceder às propriedades de 'dadosregisto'
+-    if (dadosregisto.nome === "" || dadosregisto.email === "" || dadosregisto.primeiroNome === "" || dadosregisto.ultimoNome === "" || dadosregisto.telefone === "" || dadosregisto.senha === "") {
+-        alert("Por favor, preencha todos os campos obrigatórios.");
+-        return;
+-    }
+-
+-    // Guardar o primeiro nome para a saudação no Dashboard
+-    localStorage.setItem("userName", dadosregisto.primeiroNome);
+-
+-    alert(`Bem-vindo, ${dadosregisto.primeiroNome}! Conta criada com sucesso!`);
+-    window.location.href = "Dashboard.html";
+-}
+\ No newline at end of file
++    fetch("http://localhost:8080/lferreira-tpancas-proj2/rest/users/register", {
++        method: "POST",
++        headers: {
++            "Content-Type": "application/json"
++        },
++        body: JSON.stringify(novoUser)
++    })
++        .then(response => {
++            if (response.status === 201) {
++                alert("Conta criada com sucesso!");
++                mostrarLogin();
++            } else {
++                alert("Erro ao registar utilizador.");
++            }
++        });
++}

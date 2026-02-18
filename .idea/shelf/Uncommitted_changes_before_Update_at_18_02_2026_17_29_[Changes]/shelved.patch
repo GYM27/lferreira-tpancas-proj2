@@ -1,0 +1,172 @@
+Index: JS/login.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// JS/login.js\r\n\r\nconst htmlLogin = `\r\n    <form id=\"login-form\">\r\n        <label class=\"login\" for=\"username\">Utilizador:</label>\r\n        <input type=\"text\" id=\"username\" name=\"username\" placeholder=\"Introduza o seu nome\" required>\r\n\r\n        <label class=\"login\" for=\"password\">Palavra-passe:</label>\r\n        <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Introduza a sua senha\" required>\r\n\r\n        <button type=\"submit\" class=\"botao\">ENTRAR</button>\r\n    </form>\r\n    <p>\r\n        Ainda não tem conta? <a href=\"javascript:void(0)\" onclick=\"mostrarRegisto()\">Registe-se aqui</a>\r\n    </p>\r\n`;\r\n\r\nconst htmlRegisto = `\r\n    <h2>Criar Nova Conta</h2>\r\n    <form id=\"register-form\">\r\n        <div>\r\n            <div>\r\n                <label for=\"reg-firstname\">Primeiro Nome</label>\r\n                <input type=\"text\" id=\"reg-firstname\" placeholder=\"Ex: João\" required>\r\n            </div>\r\n            <div style=\"flex: 1;\">\r\n                <label for=\"reg-lastname\">Apelido</label>\r\n                <input type=\"text\" id=\"reg-lastname\" placeholder=\"Ex: Silva\" required>\r\n            </div>\r\n        </div>\r\n\r\n        <label for=\"reg-username\">Nome de Utilizador (Username)</label>\r\n        <input type=\"text\" id=\"reg-username\" placeholder=\"Escolha um username\" required>\r\n\r\n        <label for=\"reg-email\">E-mail</label>\r\n        <input type=\"email\" id=\"reg-email\" placeholder=\"exemplo@bridge.com\" required>\r\n\r\n        <label for=\"reg-phone\">Telefone</label>\r\n        <input type=\"tel\" id=\"reg-phone\" placeholder=\"912 345 678\" required>\r\n\r\n        <label for=\"reg-password\">Palavra-passe</label>\r\n        <input type=\"password\" id=\"reg-password\" placeholder=\"Crie uma senha forte\" required>\r\n\r\n        <button type=\"submit\" class=\"botao\">REGISTAR</button>\r\n    </form>\r\n    <p>\r\n        Já tem conta? <a href=\"javascript:void(0)\" onclick=\"mostrarLogin()\" >Faça Login aqui</a>\r\n    </p>\r\n`;\r\n\r\n// Funções para trocar o conteúdo\r\nfunction mostrarRegisto() {\r\n    const box = document.querySelector(\".login-box\");\r\n    box.innerHTML = htmlRegisto;\r\n\r\n    // Captura o formulário assim que ele é injetado no HTML\r\n    const form = document.getElementById(\"register-form\");\r\n    form.onsubmit = function (event) {\r\n        event.preventDefault(); // Impede o recarregamento da página\r\n        fazerRegisto();        // Só chama a função se o navegador validar os campos\r\n    };\r\n}\r\n\r\nfunction mostrarLogin() {\r\n    const box = document.querySelector(\".login-box\");\r\n    box.innerHTML = htmlLogin;\r\n\r\n    const form = document.getElementById(\"login-form\");\r\n    form.onsubmit = function (event) {\r\n        event.preventDefault();\r\n        fazerLogin();\r\n    };\r\n}\r\n\r\nasync function fazerLogin() {\r\n\r\n    const BASE_URL = 'http://localhost:8080/lferreira-tpancas-proj2/rest/users';\r\n    \r\n    const nome = document.getElementById(\"username\").value.trim();\r\n    const senha = document.getElementById(\"password\").value.trim();\r\n\r\n    if (nome === \"\" || senha === \"\") {\r\n        alert(\"Por favor, preencha todos os campos obrigatórios.\");\r\n        return;\r\n    }\r\n\r\n    try {\r\n        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/login', {\r\n            method: 'POST',\r\n            headers: { 'Content-Type': 'application/json' },\r\n            body: JSON.stringify({ username: nome, password: senha })\r\n        });\r\n\r\n        if (response.ok) {\r\n            // Guardamos o username e a password para autenticação nos outros serviços\r\n            localStorage.setItem(\"userName\", nome);\r\n            localStorage.setItem(\"userPass\", senha); \r\n            window.location.href = \"Dashboard.html\";\r\n        } else {\r\n            alert(\"Utilizador ou palavra-passe incorretos.\");\r\n        }\r\n    } catch (error) {\r\n        console.error(\"Erro na ligação ao servidor:\", error);\r\n        alert(\"Servidor indisponível no momento.\");\r\n    }\r\n}\r\n\r\nasync function fazerRegisto() {\r\n    // Mapeamento exato dos campos para o UserPojo.java do backend\r\n    const dadosRegisto = {\r\n        username: document.getElementById(\"reg-username\").value.trim(),\r\n        password: document.getElementById(\"reg-password\").value.trim(),\r\n        email: document.getElementById(\"reg-email\").value.trim(),\r\n        firstName: document.getElementById(\"reg-firstname\").value.trim(),\r\n        lastName: document.getElementById(\"reg-lastname\").value.trim(),\r\n        cellphone: document.getElementById(\"reg-phone\").value.trim()\r\n    };\r\n\r\n    if (Object.values(dadosRegisto).some(v => v === \"\")) {\r\n        alert(\"Preencha todos os campos.\");\r\n        return;\r\n    }\r\n\r\n    try {\r\n        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/register', {\r\n            method: 'POST',\r\n            headers: { 'Content-Type': 'application/json' },\r\n            body: JSON.stringify(dadosRegisto)\r\n        });\r\n\r\n        if (response.ok) {\r\n            // Após registo, guardamos credenciais e entramos\r\n            localStorage.setItem(\"userName\", dadosRegisto.username);\r\n            localStorage.setItem(\"userPass\", dadosRegisto.password);\r\n            alert(`Bem-vindo, ${dadosRegisto.firstName}!`);\r\n            window.location.href = \"Dashboard.html\";\r\n        } else {\r\n            const erro = await response.json();\r\n            alert(erro.error || \"Erro ao criar conta.\");\r\n        }\r\n    } catch (error) {\r\n        console.error(\"Erro no registo:\", error);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/JS/login.js b/JS/login.js
+--- a/JS/login.js	(revision e12fa77f770cd513ecda9811d2df1a09dd4e25b9)
++++ b/JS/login.js	(date 1771435610667)
+@@ -75,35 +75,56 @@
+ async function fazerLogin() {
+ 
+     const BASE_URL = 'http://localhost:8080/lferreira-tpancas-proj2/rest/users';
+-    
+-    const nome = document.getElementById("username").value.trim();
+-    const senha = document.getElementById("password").value.trim();
++
++    const username = document.getElementById("username").value.trim();
++    const password = document.getElementById("password").value.trim();
+ 
+-    if (nome === "" || senha === "") {
++    if (username === "" || password === "") {
+         alert("Por favor, preencha todos os campos obrigatórios.");
+         return;
+     }
+ 
+     try {
+-        const response = await fetch('http://localhost:8080/lferreira-tpancas-proj2/rest/users/login', {
++        const response = await fetch(`${BASE_URL}/login`, {
+             method: 'POST',
+-            headers: { 'Content-Type': 'application/json' },
+-            body: JSON.stringify({ username: nome, password: senha })
++            headers: {
++                'Content-Type': 'application/json'
++            },
++            body: JSON.stringify({
++                username: username,
++                password: password
++            })
+         });
+ 
+-        if (response.ok) {
+-            // Guardamos o username e a password para autenticação nos outros serviços
+-            localStorage.setItem("userName", nome);
+-            localStorage.setItem("userPass", senha); 
++        if (response.status === 200) {
++
++            const data = await response.json();
++            console.log("Login bem-sucedido:", data);
++
++            // Guardar apenas o necessário
++            localStorage.setItem("userName", username);
++
++            // Redirecionar
+             window.location.href = "Dashboard.html";
+-        } else {
++
++        } else if (response.status === 401) {
++
+             alert("Utilizador ou palavra-passe incorretos.");
++
++        } else {
++
++            alert("Erro inesperado no servidor.");
++
+         }
++
+     } catch (error) {
++
+         console.error("Erro na ligação ao servidor:", error);
+         alert("Servidor indisponível no momento.");
++
+     }
+ }
++
+ 
+ async function fazerRegisto() {
+     // Mapeamento exato dos campos para o UserPojo.java do backend
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+--- /dev/null	(date 1771435588930)
++++ b/.idea/.gitignore	(date 1771435588930)
+@@ -0,0 +1,10 @@
++# Default ignored files
++/shelf/
++/workspace.xml
++# Ignored default folder with query files
++/queries/
++# Datasource local storage ignored files
++/dataSources/
++/dataSources.local.xml
++# Editor-based HTTP Client requests
++/httpRequests/
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+--- /dev/null	(date 1771435588937)
++++ b/.idea/modules.xml	(date 1771435588937)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/lferreira-tpancas-proj2.iml" filepath="$PROJECT_DIR$/.idea/lferreira-tpancas-proj2.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/lferreira-tpancas-proj2.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/lferreira-tpancas-proj2.iml b/.idea/lferreira-tpancas-proj2.iml
+new file mode 100644
+--- /dev/null	(date 1771435588932)
++++ b/.idea/lferreira-tpancas-proj2.iml	(date 1771435588932)
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="JAVA_MODULE" version="4">
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$" />
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+new file mode 100644
+--- /dev/null	(date 1771435588933)
++++ b/.idea/misc.xml	(date 1771435588933)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="24" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/out" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1771435588938)
++++ b/.idea/vcs.xml	(date 1771435588938)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
