@@ -139,6 +139,7 @@ nav ul {
     text-decoration: none;
     font-weight: bold;
     min-width: 100%;
+    text-align: center;
 }
 
 .botao:hover {
@@ -339,4 +340,52 @@ nav ul {
 #btn-cancelar:hover {
     transform: scale(1.2);
     transition: 0.3s;
+}
+
+/* Faz o layout do Perfil igual ao resto (Dashboard/Leads/Clientes/...) */
+#perfil-main {
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+}
+
+/* Estilo do perfil dentro do card */
+.perfil-top {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+
+.foto-perfil {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #122162;
+}
+
+/* grid do formulário */
+.perfil-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
 }

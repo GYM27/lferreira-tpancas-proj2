@@ -108,3 +108,68 @@ footer {
     text-align: center;
     color: #666;
 }
+
+.perfil-container {
+    background: #f5f6fa;
+    padding: 30px;
+    border-radius: 10px;
+    width: 80%;
+    margin: 30px auto;
+}
+
+.perfil-container h2 {
+    margin-bottom: 20px;
+}
+
+.perfil-top {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.foto-perfil {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #1f2a60;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.full-width {
+    width: 100%;
+}
+
+input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.btn-guardar {
+    background-color: #1f2a60;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-guardar:hover {
+    background-color: #162048;
+}

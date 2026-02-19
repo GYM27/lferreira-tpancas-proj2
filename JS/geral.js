@@ -73,6 +73,10 @@ function getIdCliente(id) {
   });
 }
 
+function irParaPerfil() {
+    window.location.href = "perfil.html";
+}
+
 
 function logout() {
     // Apaga TODOS os dados de ambos os armazenamentos, conforme exigido no enunciado
