@@ -73,6 +73,10 @@ function getIdCliente(id) {
   });
 }
 
+function irParaPerfil() {
+    window.location.href = "perfil.html";
+}
+
 
 function logout() {
     // Apaga todos os dados guardados em ambos os tipos de armazenamento local
