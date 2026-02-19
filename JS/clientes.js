@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const botoes = card.querySelectorAll('.button-edit-objects');
-        
+
         // Botão Editar
         botoes[0].addEventListener('click', (e) => {
             e.stopPropagation();
@@ -139,14 +139,29 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem('meusClientes', JSON.stringify(listaParaGuardar));
     }
 
-    function carregarListaClientes() {
-        const dadosGuardados = localStorage.getItem('meusClientes');
-        if (dadosGuardados) {
-            const listaClientes = document.getElementById('lista-clientes');
-            listaClientes.innerHTML = ""; // Limpa para evitar duplicados
-            JSON.parse(dadosGuardados).forEach(c => {
-                criarElementoCard(c.nome, c.email, c.telefone, c.organizacao, c.id);
+    async function carregarListaClientes() {
+        const username = localStorage.getItem("userName");
+        const password = localStorage.getItem("password");
+
+        try {
+            const response = await fetch(`http://localhost:8080/lferreira-tpancas-proj2/rest/users/${username}/clients`, {
+                method: 'GET',
+                headers: {
+                    'username': username,
+                    'password': password,
+                    'Content-Type': 'application/json'
+                }
             });
+
+            if (response.ok) {
+                const clientes = await response.json();
+                const listaClientes = document.getElementById('lista-clientes');
+                listaClientes.innerHTML = "";
+                clientes.forEach(c => criarElementoCard(c.nome_responsavel, c.email, c.telefone, c.organizacao, c.id));
+            }
+        } catch (error) {
+            console.error("Erro ao carregar clientes:", error);
         }
     }
+
 });

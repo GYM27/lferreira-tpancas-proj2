@@ -75,10 +75,10 @@ function getIdCliente(id) {
 
 
 function logout() {
-    // Apaga todos os dados guardados em ambos os tipos de armazenamento local
-    localStorage.removeItem("userName");
+    // Apaga TODOS os dados de ambos os armazenamentos, conforme exigido no enunciado
+    localStorage.clear();
+    sessionStorage.clear();
 
-    // Redireciona o utilizador de volta para a página de login
+    // Redireciona para a página de login
     window.location.href = "Login.html";
 }
-
