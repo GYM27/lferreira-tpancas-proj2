@@ -1,206 +1,185 @@
+// --- 1. CONFIGURAÇÕES E ESTADO GLOBAL ---
+const BASE_URL = "http://localhost:8080/lferreira-tpancas-proj2/rest/users";
+const username = localStorage.getItem("userName");
+
+let leadList = []; 
+let idEmEdicao = null;
 let filtroAtual = "Todos";
 
-let leadList = JSON.parse(localStorage.getItem("leadList")) || [];
-let idEmEdicao = null;
+// Mapeamento para exibir nomes em vez de números na tabela
+const mapeamentoEstados = {
+    "1": "Novo",
+    "2": "Em Análise",
+    "3": "Proposta",
+    "4": "Ganho",
+    "5": "Perdido"
+};
 
-// para ler o estado da URL - se houver estado, usa-o como filtro
-const params = new URLSearchParams(window.location.search);
-const estadoURL = params.get("estado");
-
-if (estadoURL) {
-  filtroAtual = estadoURL;
+function getAuthHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "username": localStorage.getItem("userName"),
+        "password": localStorage.getItem("userPass")
+    };
 }
 
-renderizarLista();
-
-const selectFiltro = document.getElementById("filtroEstado");
-if (selectFiltro && estadoURL) {
-  selectFiltro.value = estadoURL;
-}
-
-// renderizar lista
-function renderizarLista() {
-
-  const corpo = document.getElementById("corpoTabela");
-  if (!corpo) return;
-
-  corpo.innerHTML = "";
-
-  let listaFiltrada = leadList;
-
-  if (filtroAtual !== "Todos") {
-    listaFiltrada = leadList.filter(function (lead) {
-      return lead.estado === filtroAtual;
-    });
-  }
-
-  listaFiltrada.forEach(function (lead) {
-
-    const linha = document.createElement("tr");
-
-    linha.innerHTML = `
-      <td>${lead.titulo}</td>
-      <td>${lead.descricao}</td>
-      <td>${lead.estado}</td>
-      <td>
-        <button class="button-edit-objects" data-tooltip="Editar" onclick="editarLead(${lead.id})"> 
-       <i class="fa-solid fa-pen"></i> 
-       </button> 
-       <button class="button-edit-objects" data-tooltip="Eliminar" onclick="removerItem(${lead.id})"> 
-       <i class="fa-solid fa-trash"></i> 
-       </button> 
-
-      </td>
-    `;
-
-    corpo.appendChild(linha);
-  });
-}
-
-
-// Criar Lead
-function criarLead(titulo, descricao, estado) {
-
-  const novaLead = {
-    id: Date.now(),
-    titulo,
-    descricao,
-    estado
-  };
-
-  leadList.push(novaLead);
-  localStorage.setItem("leadList", JSON.stringify(leadList));
-
-  renderizarLista();
-}
-
-
-// Editar
-function editarLead(id) {
-
-  const lead = leadList.find(l => l.id === id);
-  if (!lead) return;
-
-  idEmEdicao = id;
-
-  document.getElementById("lista-container").style.display = "none";
-  document.getElementById("formLead").classList.remove("form-hidden");
-
-  document.getElementById("titulo").value = lead.titulo;
-  document.getElementById("descricao").value = lead.descricao;
-  document.getElementById("estado").value = lead.estado;
-}
-
-
-// Eliminar
-function eliminarLead(id) {
-
-  leadList = leadList.filter(l => l.id !== id);
-  localStorage.setItem("leadList", JSON.stringify(leadList));
-
-  renderizarLista();
-}
-
-
-// Guardar alterações do formulário
-const btnGuardar = document.getElementById("guardarLead");
-
-if (btnGuardar) {
-  btnGuardar.addEventListener("click", function () {
-
-    const titulo = document.getElementById("titulo").value;
-    const descricao = document.getElementById("descricao").value;
-    const estado = document.getElementById("estado").value;
-
-    if (idEmEdicao === null) {
-      criarLead(titulo, descricao, estado);
-    } else {
-      leadList.forEach(function (lead) {
-        if (lead.id === idEmEdicao) {
-          lead.titulo = titulo;
-          lead.descricao = descricao;
-          lead.estado = estado;
-        }
-      });
-      localStorage.setItem("leadList", JSON.stringify(leadList));
-      renderizarLista();
-    }
-
-    fecharFormulario();
-  });
-}
-
-
-// 🔹 CANCELAR
-const btnCancelar = document.getElementById("cancelarLead");
-
-if (btnCancelar) {
-  btnCancelar.addEventListener("click", fecharFormulario);
-}
-
-
-// fechar formulário
-function fecharFormulario() {
-
-  document.getElementById("formLead").classList.add("form-hidden");
-  document.getElementById("lista-container").style.display = "block";
-
-  document.getElementById("titulo").value = "";
-  document.getElementById("descricao").value = "";
-  document.getElementById("estado").value = "Novo";
-
-  idEmEdicao = null;
-}
-
-
-// BOTÃO +
-const btnCriar = document.querySelector('[data-acao="criar"]');
-
-if (btnCriar) {
-  btnCriar.addEventListener("click", function () {
-
-    idEmEdicao = null;
-
-    document.getElementById("lista-container").style.display = "none";
-    document.getElementById("formLead").classList.remove("form-hidden");
-
-  });
-}
-
-
-// filtro de estado
-document.getElementById("filtroEstado").addEventListener("change", function () {
-  filtroAtual = this.value;
-  renderizarLista();
+// Inicialização
+document.addEventListener("DOMContentLoaded", () => {
+    carregarLeads();
+    configurarEventos();
 });
 
-function removerItem(id) {
+// --- 2. COMUNICAÇÃO COM O SERVIDOR (API REST) ---
 
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-
-  overlay.innerHTML = `
-    <div class="modal-box">
-      <h3>Confirmar Exclusão</h3>
-      <p>Tem a certeza de que deseja apagar?</p>
-      <div class="modal-buttons">
-        <button id="btn-confirmar" class="btn-acao">Sim, apagar!</button>
-        <button id="btn-cancelar" class="btn-acao">Cancelar</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-
-  document.getElementById('btn-confirmar').onclick = function () {
-    eliminarLead(id);
-    document.body.removeChild(overlay);
-  };
-
-  document.getElementById('btn-cancelar').onclick = function () {
-    document.body.removeChild(overlay);
-  };
+// LISTAR (GET)
+async function carregarLeads() {
+    try {
+        const response = await fetch(`${BASE_URL}/${username}/leads`, {
+            method: "GET",
+            headers: getAuthHeaders()
+        });
+        if (response.ok) {
+            leadList = await response.json();
+            renderizarLista();
+        }
+    } catch (error) {
+        console.error("Erro ao carregar leads:", error);
+    }
 }
 
-// Inicializar
-renderizarLista();
+// GRAVAR (POST/PUT)
+async function guardarLeadNoServidor() {
+    const inputTitulo = document.getElementById("titulo").value;
+    const inputDesc = document.getElementById("descricao").value;
+    const inputEstado = document.getElementById("estado").value;
+
+    if (!inputTitulo || !inputDesc) {
+        alert("Por favor, preencha o título e a descrição.");
+        return;
+    }
+
+    const leadData = {
+        title: inputTitulo,           // Mapeia para String title no Java
+        description: inputDesc,       // Mapeia para String description
+        state: parseInt(inputEstado)  // Mapeia para Integer state
+    };
+
+    let url = `${BASE_URL}/${username}/leads/addLead`;
+    let metodo = "POST";
+
+    if (idEmEdicao !== null) {
+        leadData.id = idEmEdicao;
+        url = `${BASE_URL}/${username}/leads/editLead`;
+        metodo = "PUT";
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: metodo,
+            headers: getAuthHeaders(),
+            body: JSON.stringify(leadData)
+        });
+
+        if (response.ok) {
+            fecharFormulario();
+            carregarLeads();
+        } else {
+            alert("Erro ao gravar no servidor (Erro 500).");
+        }
+    } catch (error) {
+        console.error("Erro na ligação:", error);
+    }
+}
+
+// ELIMINAR (DELETE)
+async function eliminarLeadNoServidor(id) {
+    if (!confirm("Tem a certeza que deseja eliminar esta lead?")) return;
+
+    try {
+        const response = await fetch(`${BASE_URL}/${username}/leads/remove?id=${id}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        });
+        if (response.ok) carregarLeads();
+    } catch (error) {
+        console.error("Erro ao eliminar:", error);
+    }
+}
+
+// --- 3. INTERFACE E RENDERIZAÇÃO ---
+
+function renderizarLista() {
+    const corpo = document.getElementById("corpoTabela");
+    if (!corpo) return;
+    corpo.innerHTML = "";
+
+    // Filtra localmente com base no ID do estado
+    const filtradas = filtroAtual === "Todos" 
+        ? leadList 
+        : leadList.filter(l => String(l.state) === filtroAtual);
+
+    filtradas.forEach(lead => {
+        const tr = document.createElement("tr");
+        
+        // Tradução do número para texto usando o objeto mapeamentoEstados
+        const textoEstado = mapeamentoEstados[lead.state] || "Desconhecido";
+
+        tr.innerHTML = `
+            <td>${lead.title}</td> 
+            <td>${lead.description}</td>
+            <td><span class="status-badge">${textoEstado}</span></td>
+            <td>
+                <button class="btn-editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+            </td>`;
+        
+        tr.querySelector(".btn-editar").onclick = () => prepararEdicao(lead);
+        tr.querySelector(".btn-eliminar").onclick = () => eliminarLeadNoServidor(lead.id);
+        corpo.appendChild(tr);
+    });
+}
+
+function configurarEventos() {
+    // Botão Gravar
+    document.getElementById("guardarLead").onclick = guardarLeadNoServidor;
+    
+    // Botão Cancelar
+    document.getElementById("cancelarLead").onclick = fecharFormulario;
+
+    // Botão Criar (+)
+    document.querySelector('[data-acao="criar"]').onclick = () => {
+        idEmEdicao = null;
+        document.getElementById("formLead").classList.remove("form-hidden");
+        document.getElementById("lista-container").style.display = "none";
+        // Garante que o título do formulário diz "Nova Lead"
+        document.querySelector("#formLead h3").innerText = "Nova Lead";
+    };
+
+    // Filtro de Estado
+    document.getElementById("filtroEstado").onchange = (e) => {
+        filtroAtual = e.target.value;
+        renderizarLista();
+    };
+}
+
+function prepararEdicao(lead) {
+    idEmEdicao = lead.id;
+    document.getElementById("titulo").value = lead.title;
+    document.getElementById("descricao").value = lead.description;
+    document.getElementById("estado").value = lead.state;
+    
+    document.querySelector("#formLead h3").innerText = "Editar Lead";
+    document.getElementById("formLead").classList.remove("form-hidden");
+    document.getElementById("lista-container").style.display = "none";
+}
+
+function fecharFormulario() {
+    document.getElementById("formLead").classList.add("form-hidden");
+    document.getElementById("lista-container").style.display = "block";
+    
+    // Limpeza manual para evitar erro de ".reset() is not a function"
+    document.getElementById("titulo").value = "";
+    document.getElementById("descricao").value = "";
+    document.getElementById("estado").value = "1";
+    idEmEdicao = null;
+}
