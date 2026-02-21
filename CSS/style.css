@@ -9,6 +9,8 @@ header {
     width: 100%;
     height: 150px;
     display: flex;
+    align-items: flex-end;
+    padding-bottom: 15px;
     background-color: rgb(18, 33, 98);
     margin-bottom: 30px;
 }
@@ -67,13 +69,11 @@ h1 {
 
 .sessao {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
     margin-left: auto;
-    margin-right: 20px;
+    margin-right: 30px;
     color: white;
-    text-align: right;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 500;
 }
 
@@ -100,7 +100,7 @@ nav ul {
 }
 
 #saudacao {
-    margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .dashboard-page,
@@ -353,16 +353,16 @@ nav ul {
 .perfil-top {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin: 20px;
 }
 
 
 .foto-perfil {
-    width: 90px;
-    height: 90px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #122162;
+    border: 3px solid #1d2b64;
 }
 
 /* grid do formulário */
@@ -388,4 +388,65 @@ nav ul {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 6px;
+}
+
+.perfil-link {
+    text-decoration: none;
+    color: white;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s ease;
+}
+
+.perfil-link:hover {
+    opacity: 0.7;
+}
+
+/* Foto do utilizador */
+.header-foto {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.header-foto:hover {
+    transform: scale(1.08);
+}
+
+/* Wrapper do menu */
+.user-menu {
+    position: relative;
+}
+
+/* Dropdown escondido */
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 8px 0;
+    display: none;
+    min-width: 170px;
+    animation: surgindo 0.2s ease;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #1d2b64;
+    font-weight: 500;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f0f4ff;
 }

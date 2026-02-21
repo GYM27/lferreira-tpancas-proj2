@@ -98,6 +98,7 @@ async function fazerLogin() {
         if (response.ok) {
             //Guardamos apenas o username
             localStorage.setItem("userName", nome);
+            localStorage.setItem("userPass", senha);
 
             window.location.href = "Dashboard.html";
         } else {
@@ -140,7 +141,7 @@ async function fazerRegisto() {
         if (response.ok) {
             //Guardamos apenas o username
             localStorage.setItem("userName", dadosRegisto.username);
-            localStorage.setItem("password", dadosRegisto.password);
+            localStorage.setItem("userPass", dadosRegisto.password);
 
             alert(`Bem-vindo, ${dadosRegisto.firstName}!`);
             window.location.href = "Dashboard.html";

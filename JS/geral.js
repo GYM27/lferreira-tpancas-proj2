@@ -5,7 +5,32 @@ function loadHeader() {
       document.getElementById("header-placeholder").innerHTML = html;
 
       atualizarSaudacao();
+      inicializarMenuUtilizador();
     });
+}
+
+function inicializarMenuUtilizador() {
+
+    const foto = document.getElementById("header-foto");
+    const menu = document.getElementById("dropdown-menu");
+
+    if (!foto || !menu) return;
+
+    foto.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menu.style.display =
+            menu.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", () => {
+        menu.style.display = "none";
+    });
+
+    // Carregar foto guardada
+    const fotoGuardada = localStorage.getItem("userPhoto");
+    if (fotoGuardada && fotoGuardada.trim() !== "") {
+        foto.src = fotoGuardada;
+    }
 }
 
 function atualizarSaudacao() {

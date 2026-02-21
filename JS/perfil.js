@@ -41,9 +41,14 @@ async function carregarPerfil() {
     document.getElementById("firstName").value = user.firstName;
     document.getElementById("lastName").value = user.lastName;
     document.getElementById("cellphone").value = user.cellphone;
-    document.getElementById("photo").value = user.photo;
+    document.getElementById("photoUrl").value = user.photo || "";
 
-    document.getElementById("profile-photo").src = user.photo;
+//Versão mais segura (evita null, undefined ou string vazia)
+    const photo = user.photo && user.photo.trim() !== ""
+        ? user.photo
+        : "images/default-avatar.png";
+
+    document.getElementById("fotoPerfil").src = photo;
 }
 
 
@@ -60,7 +65,7 @@ async function atualizarPerfil(event) {
         firstName: document.getElementById("firstName").value,
         lastName: document.getElementById("lastName").value,
         cellphone: document.getElementById("cellphone").value,
-        photo: document.getElementById("photo").value
+        photo: document.getElementById("photoUrl").value
     };
 
     const response = await fetch(`${BASE_URL}/${username}/profile`, {
@@ -71,7 +76,7 @@ async function atualizarPerfil(event) {
 
     if (response.ok) {
         alert("Perfil atualizado com sucesso!");
-        carregarPerfil();
+        window.location.href = "Dashboard.html";
     } else {
         alert("Erro ao atualizar perfil.");
     }
@@ -80,6 +85,9 @@ async function atualizarPerfil(event) {
 
 //Listar Leads
 async function carregarLeads() {
+
+    const listaLeads = document.getElementById("lista-leads");
+    if (!listaLeads) return; //evita erro se não existir
 
     const username = localStorage.getItem("userName");
 
@@ -90,7 +98,6 @@ async function carregarLeads() {
     if (!response.ok) return;
 
     const leads = await response.json();
-    const lista = document.getElementById("lista-leads");
     lista.innerHTML = "";
 
     leads.forEach(lead => {
@@ -103,6 +110,9 @@ async function carregarLeads() {
 
 //Listar Clientes
 async function carregarClientes() {
+
+    const listaClients = document.getElementById("lista-clientes");
+    if (!listaClients) return; //evita erro se não existir
 
     const username = localStorage.getItem("userName");
 
