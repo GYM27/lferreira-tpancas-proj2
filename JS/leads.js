@@ -129,8 +129,8 @@ function renderizarLista() {
             <td>${lead.description}</td>
             <td><span class="status-badge">${textoEstado}</span></td>
             <td>
-                <button class="btn-editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                <button class="button-edit-objects btn-editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                <button class="button-edit-objects btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
             </td>`;
         
         tr.querySelector(".btn-editar").onclick = () => prepararEdicao(lead);

@@ -20,8 +20,8 @@ function renderizarTabela() {
         let acoesCell = row.insertCell(5);
         // Adicionamos os dois botões: Editar e Remover
         acoesCell.innerHTML = `
-            <button class="btn-acao" onclick="editarProjeto(${index})" data-tooltip="Editar projeto"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn-acao" onclick="removerItem(${index})" data-tooltip="Remover projeto"><i class="fa-solid fa-trash"></i></button>
+            <button class="button-edit-objects btn-editar" onclick="editarProjeto(${index})" data-tooltip="Editar"><i class="fa-solid fa-pen"></i></button>
+            <button class="button-edit-objects btn-eliminar" onclick="removerItem(${index})" data-tooltip="Remover"><i class="fa-solid fa-trash"></i></button>
         `;
     });
 }

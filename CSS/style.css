@@ -254,18 +254,9 @@ nav ul {
 }
 
 
-.btn-acao {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 16px;
-    color: rgb(18, 33, 98);
-}
 
-.btn-acao:hover {
-    transform: scale(1.5);
-    transition: 0.3s;
-}
+
+
 
 /* Fundo escuro que cobre a tela toda */
 .modal-overlay {

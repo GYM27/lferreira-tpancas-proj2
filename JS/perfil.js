@@ -43,7 +43,7 @@ async function carregarPerfil() {
     document.getElementById("cellphone").value = user.cellphone;
     document.getElementById("photoUrl").value = user.photo || "";
 
-//Versão mais segura (evita null, undefined ou string vazia)
+    //Versão mais segura (evita null, undefined ou string vazia)
     const photo = user.photo && user.photo.trim() !== ""
         ? user.photo
         : "images/default-avatar.png";
@@ -98,7 +98,7 @@ async function carregarLeads() {
     if (!response.ok) return;
 
     const leads = await response.json();
-    lista.innerHTML = "";
+    listaLeads.innerHTML = "";
 
     leads.forEach(lead => {
         const li = document.createElement("li");
@@ -124,7 +124,7 @@ async function carregarClientes() {
 
     const clientes = await response.json();
     const lista = document.getElementById("lista-clientes");
-    lista.innerHTML = "";
+    listaClients.innerHTML = "";
 
     clientes.forEach(cliente => {
         const li = document.createElement("li");
