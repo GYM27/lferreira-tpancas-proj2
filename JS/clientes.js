@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnCancelar = document.getElementById('cancelar');
     const formContainer = document.getElementById('form-container');
     const formCliente = document.getElementById('form-cliente');
-    
+
 
     // --- 1. INICIALIZAÇÃO ---
     carregarListaClientes();
@@ -66,7 +66,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (response.ok) {
                 fecharFormulario();
-                carregarListaClientes(); // Recarrega a lista do servidor
+
+                setTimeout(() => {
+                    carregarListaClientes();
+                }, 300); // Recarrega a lista do servidor
             } else {
                 alert("Erro ao comunicar com o servidor.");
             }
@@ -86,27 +89,47 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
                 const clientes = await response.json();
                 const listaClientes = document.getElementById('lista-clientes');
+
+                // Limpa a lista atual para renderizar a nova versão do JSON
                 listaClientes.innerHTML = "";
-                // Usa as chaves do Pojo: nome, email, telefone, organizacao
-                clientes.forEach(c => criarElementoCard(c.nome, c.email, c.telefone, c.organizacao, c.id));
+
+                if (clientes && clientes.length > 0) {
+                    clientes.forEach(c => {
+                        // Passa exatamente os campos do teu ClientesPojo
+                        criarElementoCard(c.nome, c.email, c.telefone, c.organizacao, c.id);
+                    });
+
+                }
             }
         } catch (error) {
-            console.error("Erro ao carregar clientes:", error);
+            console.error("Erro ao carregar lista:", error);
         }
     }
 
     async function eliminarNoServidor(id) {
+        if (!id) {
+            console.error("Erro: ID inválido");
+            return;
+        }
+
+        const username = localStorage.getItem("userName");
+        // O nome do parâmetro na URL deve ser 'id' porque o seu Java usa @QueryParam("id")
+        // O Java mapeia esse valor para a variável interna 'clientId'
+        const url = `${BASE_URL}/${username}/clients/remove?id=${id}`;
+
         try {
-            const response = await fetch(`${BASE_URL}/${username}/clients/remove?id=${id}`, {
+            const response = await fetch(url, {
                 method: 'DELETE',
-                headers: getAuthHeaders()
+                headers: getAuthHeaders() // Garante que envia os Headers exigidos
             });
 
             if (response.ok) {
                 carregarListaClientes();
+            } else {
+                console.error("Erro ao apagar cliente");
             }
         } catch (error) {
-            console.error("Erro ao eliminar:", error);
+            console.error("Erro na ligação:", error);
         }
     }
 
@@ -150,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
             card.classList.toggle('fechado');
         });
 
-        
+
         // Seleção semântica (por classe específica)
         const btnEditar = card.querySelector('.btn-editar');
         const btnEliminar = card.querySelector('.btn-eliminar');
@@ -173,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (btnEliminar) {
             btnEliminar.addEventListener('click', (e) => {
                 e.stopPropagation();
+
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
@@ -187,7 +211,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.body.appendChild(overlay);
 
                 overlay.querySelector('#btn-confirmar').onclick = () => {
-                    eliminarNoServidor(id);
+                    if (id !== undefined && id !== null) {
+                        eliminarNoServidor(id);
+                    } else {
+                        console.error("Erro: ID do cliente não encontrado.");
+                    }
                     document.body.removeChild(overlay);
                 };
 
