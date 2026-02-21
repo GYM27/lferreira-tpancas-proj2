@@ -1,6 +1,42 @@
+// --- 1. CONFIGURAÇÕES E ESTADO GLOBAL ---
+const BASE_URL = "http://localhost:8080/lferreira-tpancas-proj2/rest/users";
+const username = localStorage.getItem("userName");
 
-let projetos = JSON.parse(localStorage.getItem('box-lista')) || [];
-let indexEditando = -1; // Variável para controlar se estamos editando (-1 significa novo projeto)
+let projetosList = JSON.parse(localStorage.getItem('box-lista')) || [];
+let indexEditando = -1; 
+let clientesDisponiveis = [];
+
+// Opções de estado para uniformização
+const opcoesEstados = ["Planeamento", "Em Curso", "Concluído", "Suspenso"];
+
+// Inicialização
+document.addEventListener("DOMContentLoaded", () => {
+    carregarClientesParaDropdown();
+    renderizarTabela();
+    configurarEventos();
+});
+
+// --- 2. COMUNICAÇÃO E DADOS ---
+
+// Carrega clientes do servidor para popular o select de projetos
+async function carregarClientesParaDropdown() {
+    try {
+        const response = await fetch(`${BASE_URL}/${username}/clients`, {
+            method: "GET",
+            headers: {
+                "username": username,
+                "password": localStorage.getItem("userPass")
+            }
+        });
+        if (response.ok) {
+            clientesDisponiveis = await response.json();
+        }
+    } catch (error) {
+        console.error("Erro ao carregar clientes para o formulário:", error);
+    }
+}
+
+// --- 3. INTERFACE E RENDERIZAÇÃO ---
 
 function renderizarTabela() {
     const corpoTabela = document.getElementById('corpoTabela');
@@ -8,93 +44,86 @@ function renderizarTabela() {
 
     corpoTabela.innerHTML = "";
 
-    projetos.forEach((projeto, index) => {
+    projetosList.forEach((projeto, index) => {
         let row = corpoTabela.insertRow();
 
-        row.insertCell(0).textContent = projeto.nome || "";
-        row.insertCell(1).textContent = projeto.cliente || "";
-        row.insertCell(2).textContent = projeto.estado || "";
-        row.insertCell(3).textContent = projeto.dataInicio || "";
-        row.insertCell(4).textContent = projeto.dataFim || "";
+        row.innerHTML = `
+            <td>${projeto.nome || ""}</td>
+            <td>${projeto.cliente || ""}</td>
+            <td><span class="status-badge">${projeto.estado || ""}</span></td>
+            <td>${projeto.dataInicio || ""}</td>
+            <td>${projeto.dataFim || ""}</td>
+            <td>
+                <button class="button-edit-objects btn-editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                <button class="button-edit-objects btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+            </td>`;
 
-        let acoesCell = row.insertCell(5);
-        // Adicionamos os dois botões: Editar e Remover
-        acoesCell.innerHTML = `
-            <button class="button-edit-objects btn-editar" onclick="editarProjeto(${index})" data-tooltip="Editar"><i class="fa-solid fa-pen"></i></button>
-            <button class="button-edit-objects btn-eliminar" onclick="removerItem(${index})" data-tooltip="Remover"><i class="fa-solid fa-trash"></i></button>
-        `;
+        row.querySelector(".btn-editar").onclick = () => editarProjeto(index);
+        
+        // Uso do Modal Uniformizado do geral.js
+        row.querySelector(".btn-eliminar").onclick = () => {
+            abrirModalConfirmacao(
+                `Tem a certeza de que deseja apagar o projeto <strong>${projeto.nome}</strong>?`,
+                () => eliminarProjeto(index)
+            );
+        };
     });
 }
 
-function editarProjeto(index) {
-    indexEditando = index; // Marcamos qual projeto estamos editando
-    const p = projetos[index];
-
-    abrirFormulario();
-
-    // Preenchemos os campos com os valores atuais do projeto
-    document.getElementById('input-nome').value = p.nome;
-    document.getElementById('input-cliente').value = p.cliente;
-    document.getElementById('input-estado').value = p.estado;
-    document.getElementById('input-data-inicio').value = p.dataInicio;
-    document.getElementById('input-data-fim').value = p.dataFim;
+function eliminarProjeto(index) {
+    projetosList.splice(index, 1);
+    localStorage.setItem('box-lista', JSON.stringify(projetosList));
+    renderizarTabela();
 }
 
 function abrirFormulario() {
     const boxLista = document.getElementById('box-lista');
+    if (!boxLista) return;
 
-    // Definimos os estados possíveis (ajuste conforme sua necessidade)
-    const opcoesEstados = ["Planeamento", "Em Curso", "Concluído", "Suspenso"];
-
-    // --- BUSCA DINÂMICA DE CLIENTES ---   
-    // 1. Pegamos a string do localStorage
-    const clientesGuardados = localStorage.getItem('meusClientes');
-    // 2. Convertemos para array ou criamos um array vazio se não existir
-    const listaClientesObjetos = clientesGuardados ? JSON.parse(clientesGuardados) : [];
-    // 3. Extraímos apenas o nome da organização para o dropdown
-    const nomesClientes = listaClientesObjetos.map(c => c.organizacao);
+    // Gera as opções do dropdown de clientes vindos do servidor
+    const optionsClientes = clientesDisponiveis.map(c => 
+        `<option value="${c.organizacao}">${c.organizacao}</option>`
+    ).join('');
 
     boxLista.innerHTML = `
         <div class="form-container">
             <h3>${indexEditando === -1 ? 'Novo Projeto' : 'Editar Projeto'}</h3>
             
-            <label>Nome do Projeto:</label>
+            <label for="input-nome">Nome do Projeto:</label>
             <input type="text" id="input-nome" placeholder="Nome do Projeto">
             
-            <label>Cliente:</label>
+            <label for="input-cliente">Cliente:</label>
             <select id="input-cliente">
                 <option value="">Selecione um cliente...</option>
-                    ${nomesClientes.map(cliente => `<option value="${cliente}">${cliente}</option>`).join('')}
+                ${optionsClientes}
             </select>
             
-            <label>Estado do Projeto:</label>
+            <label for="input-estado">Estado do Projeto:</label>
             <select id="input-estado">
-                ${opcoesEstados.map(estado => `<option value="${estado}">${estado}</option>`).join('')}
+                ${opcoesEstados.map(e => `<option value="${e}">${e}</option>`).join('')}
             </select>
             
-            <label>Data de Início:</label>
+            <label for="input-data-inicio">Data de Início:</label>
             <input type="date" id="input-data-inicio">
             
-            <label>Data de Fim:</label>
+            <label for="input-data-f-fim">Data de Fim:</label>
             <input type="date" id="input-data-fim">
             
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div class="modal-buttons">
                 <button class="button-edit-objects" onclick="salvarProjeto()" data-tooltip="Guardar"><i class="fa-solid fa-floppy-disk"></i></button>
                 <button class="button-edit-objects" onclick="window.location.reload()" data-tooltip="Cancelar"><i class="fa-solid fa-ban"></i></button>
             </div>
         </div>
     `;
 
-    // Se estivermos editando, precisamos selecionar a opção correta no select
     if (indexEditando !== -1) {
-        const p = projetos[indexEditando];
+        const p = projetosList[indexEditando];
         document.getElementById('input-nome').value = p.nome;
         document.getElementById('input-cliente').value = p.cliente;
-        document.getElementById('input-estado').value = p.estado; // Seleciona automaticamente
+        document.getElementById('input-estado').value = p.estado;
         document.getElementById('input-data-inicio').value = p.dataInicio;
         document.getElementById('input-data-fim').value = p.dataFim;
     }
-
 }
 
 function salvarProjeto() {
@@ -106,30 +135,29 @@ function salvarProjeto() {
         dataFim: document.getElementById('input-data-fim').value
     };
 
-    if (!dados.nome) return alert("Preencha o nome!");
+    if (!dados.nome) return alert("Preencha o nome do projeto!");
 
     if (indexEditando === -1) {
-        // Modo criação
-        projetos.push(dados);
+        projetosList.push(dados);
     } else {
-        // Modo edição
-        projetos[indexEditando] = dados;
+        projetosList[indexEditando] = dados;
     }
 
-    localStorage.setItem('box-lista', JSON.stringify(projetos));
+    localStorage.setItem('box-lista', JSON.stringify(projetosList));
     window.location.reload();
 }
 
+function configurarEventos() {
+    const btnCriar = document.querySelector('[data-acao="criar"]');
+    if (btnCriar) {
+        btnCriar.onclick = () => {
+            indexEditando = -1;
+            abrirFormulario();
+        };
+    }
+}
 
-
-
-window.onload = renderizarTabela;
-
-const btnCriar = document.querySelector('[data-acao="criar"]');
-
-if (btnCriar) {
-    btnCriar.addEventListener("click", function () {
-        indexEditando = -1;
-        abrirFormulario();
-    });
+function editarProjeto(index) {
+    indexEditando = index;
+    abrirFormulario();
 }

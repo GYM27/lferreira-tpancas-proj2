@@ -6,6 +6,22 @@ let leadList = [];
 let idEmEdicao = null;
 let filtroAtual = "Todos";
 
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Verificar se existe um filtro vindo do Dashboard
+    const urlParams = new URLSearchParams(window.location.search);
+    const stateParam = urlParams.get('state');
+
+    if (stateParam) {
+        filtroAtual = stateParam;
+        // Atualiza o valor visual do select de filtro, se ele existir
+        const selectFiltro = document.getElementById("filtroEstado");
+        if (selectFiltro) selectFiltro.value = stateParam;
+    }
+
+    carregarLeads(); // Esta função já chama o renderizarLista() que usa o filtroAtual
+    configurarEventos();
+});
+
 // Mapeamento para exibir nomes em vez de números na tabela
 const mapeamentoEstados = {
     "1": "Novo",
