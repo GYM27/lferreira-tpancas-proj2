@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3aed9ea2-53b6-47ae-87ce-1ce9d04b7f4e" name="Changes" comment="Merge branch 'main' of https://github.com/GYM27/lferreira-tpancas-proj2">
-      <change afterPath="$PROJECT_DIR$/images/default-avatar.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/users/test-avatar.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CSS/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/CSS/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JS/geral.js" beforeDir="false" afterPath="$PROJECT_DIR$/JS/geral.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JS/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/JS/login.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JS/perfil.js" beforeDir="false" afterPath="$PROJECT_DIR$/JS/perfil.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/header.html" afterDir="false" />
     </list>
@@ -114,7 +110,8 @@
       <workItem from="1771494797232" duration="2790000" />
       <workItem from="1771512706389" duration="8567000" />
       <workItem from="1771603558780" duration="3511000" />
-      <workItem from="1771616935229" duration="12162000" />
+      <workItem from="1771616935229" duration="12517000" />
+      <workItem from="1771689903395" duration="3496000" />
     </task>
     <task id="LOCAL-00001" summary="Integracao de login e registo  com backend">
       <option name="closed" value="true" />
@@ -132,7 +129,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771499199687</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Merge branch 'main' of https://github.com/GYM27/lferreira-tpancas-proj2">
+      <option name="closed" value="true" />
+      <created>1771638178374</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1771638178374</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

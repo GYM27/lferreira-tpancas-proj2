@@ -18,7 +18,7 @@ function getAuthHeaders() {
 }
 
 
-//Carregar perfil
+/// Carregar perfil
 async function carregarPerfil() {
 
     const username = localStorage.getItem("userName");
@@ -43,12 +43,21 @@ async function carregarPerfil() {
     document.getElementById("cellphone").value = user.cellphone;
     document.getElementById("photoUrl").value = user.photo || "";
 
-    //Versão mais segura (evita null, undefined ou string vazia)
     const photo = user.photo && user.photo.trim() !== ""
         ? user.photo
         : "images/default-avatar.png";
 
+    // Atualiza foto do perfil
     document.getElementById("fotoPerfil").src = photo;
+
+    //Guarda no localStorage para usar noutras páginas
+    localStorage.setItem("userPhoto", photo);
+
+    //Atualiza foto do header (se existir)
+    const headerFoto = document.getElementById("header-foto");
+    if (headerFoto) {
+        headerFoto.src = photo;
+    }
 }
 
 

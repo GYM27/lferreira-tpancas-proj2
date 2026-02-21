@@ -1,12 +1,51 @@
 function loadHeader() {
-  fetch("header.html")
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById("header-placeholder").innerHTML = html;
+    fetch("header.html")
+        .then(response => response.text())
+        .then(async html => {
 
-      atualizarSaudacao();
-      inicializarMenuUtilizador();
-    });
+            document.getElementById("header-placeholder").innerHTML = html;
+
+            atualizarSaudacao();
+            inicializarMenuUtilizador();
+
+            //header existente
+            await carregarFotoHeader();
+        });
+}
+
+async function carregarFotoHeader() {
+
+    const headerFoto = document.getElementById("header-foto");
+    const username = localStorage.getItem("userName");
+    const password = localStorage.getItem("userPass");
+
+    if (!headerFoto || !username || !password) return;
+
+    try {
+        const response = await fetch(
+            `http://localhost:8080/lferreira-tpancas-proj2/rest/users/${username}/profile`,
+            {
+                headers: {
+                    "username": username,
+                    "password": password
+                }
+            }
+        );
+
+        if (!response.ok) return;
+
+        const user = await response.json();
+
+        const photo = user.photo && user.photo.trim() !== ""
+            ? user.photo
+            : "images/default-avatar.png";
+
+        headerFoto.src = photo;
+        localStorage.setItem("userPhoto", photo);
+
+    } catch (error) {
+        console.error("Erro ao carregar foto do header:", error);
+    }
 }
 
 function inicializarMenuUtilizador() {
