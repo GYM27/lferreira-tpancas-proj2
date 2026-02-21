@@ -2,7 +2,7 @@
 const BASE_URL = "http://localhost:8080/lferreira-tpancas-proj2/rest/users";
 const username = localStorage.getItem("userName");
 
-let leadList = []; 
+let leadList = [];
 let idEmEdicao = null;
 let filtroAtual = "Todos";
 
@@ -93,8 +93,7 @@ async function guardarLeadNoServidor() {
 
 // ELIMINAR (DELETE)
 async function eliminarLeadNoServidor(id) {
-    if (!confirm("Tem a certeza que deseja eliminar esta lead?")) return;
-
+    
     try {
         const response = await fetch(`${BASE_URL}/${username}/leads/remove?id=${id}`, {
             method: "DELETE",
@@ -114,13 +113,13 @@ function renderizarLista() {
     corpo.innerHTML = "";
 
     // Filtra localmente com base no ID do estado
-    const filtradas = filtroAtual === "Todos" 
-        ? leadList 
+    const filtradas = filtroAtual === "Todos"
+        ? leadList
         : leadList.filter(l => String(l.state) === filtroAtual);
 
     filtradas.forEach(lead => {
         const tr = document.createElement("tr");
-        
+
         // Tradução do número para texto usando o objeto mapeamentoEstados
         const textoEstado = mapeamentoEstados[lead.state] || "Desconhecido";
 
@@ -132,9 +131,14 @@ function renderizarLista() {
                 <button class="button-edit-objects btn-editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
                 <button class="button-edit-objects btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
             </td>`;
-        
+
         tr.querySelector(".btn-editar").onclick = () => prepararEdicao(lead);
-        tr.querySelector(".btn-eliminar").onclick = () => eliminarLeadNoServidor(lead.id);
+        tr.querySelector(".btn-eliminar").onclick = () => {
+            abrirModalConfirmacao(
+                `Tem a certeza de que deseja apagar a lead <strong>${lead.title}</strong>?`,
+                () => eliminarLeadNoServidor(lead.id)
+            );
+        };
         corpo.appendChild(tr);
     });
 }
@@ -142,7 +146,7 @@ function renderizarLista() {
 function configurarEventos() {
     // Botão Gravar
     document.getElementById("guardarLead").onclick = guardarLeadNoServidor;
-    
+
     // Botão Cancelar
     document.getElementById("cancelarLead").onclick = fecharFormulario;
 
@@ -167,7 +171,7 @@ function prepararEdicao(lead) {
     document.getElementById("titulo").value = lead.title;
     document.getElementById("descricao").value = lead.description;
     document.getElementById("estado").value = lead.state;
-    
+
     document.querySelector("#formLead h3").innerText = "Editar Lead";
     document.getElementById("formLead").classList.remove("form-hidden");
     document.getElementById("lista-container").style.display = "none";
@@ -176,7 +180,7 @@ function prepararEdicao(lead) {
 function fecharFormulario() {
     document.getElementById("formLead").classList.add("form-hidden");
     document.getElementById("lista-container").style.display = "block";
-    
+
     // Limpeza manual para evitar erro de ".reset() is not a function"
     document.getElementById("titulo").value = "";
     document.getElementById("descricao").value = "";

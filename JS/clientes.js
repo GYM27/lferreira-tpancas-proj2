@@ -193,33 +193,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Botão Eliminar
+        // Botão Eliminar
         if (btnEliminar) {
             btnEliminar.addEventListener('click', (e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Impede o card de abrir/fechar ao clicar no botão
 
-                const overlay = document.createElement('div');
-                overlay.className = 'modal-overlay';
-                overlay.innerHTML = `
-                <div class="modal-box">
-                    <h3>Confirmar Exclusão</h3>
-                    <p>Tem a certeza de que deseja apagar o cliente <strong>${organizacao}</strong>?</p>
-                    <div class="modal-buttons">
-                        <button id="btn-confirmar" >Sim, Apagar</button>
-                        <button id="btn-cancelar" >Cancelar</button>
-                    </div>
-                </div>`;
-                document.body.appendChild(overlay);
-
-                overlay.querySelector('#btn-confirmar').onclick = () => {
-                    if (id !== undefined && id !== null) {
-                        eliminarNoServidor(id);
-                    } else {
-                        console.error("Erro: ID do cliente não encontrado.");
+                // Chamada da função uniformizada que está no geral.js
+                abrirModalConfirmacao(
+                    `Tem a certeza de que deseja apagar o cliente <strong>${organizacao}</strong>?`,
+                    () => {
+                        // Esta é a ação que será executada se o utilizador clicar em "Sim"
+                        if (id !== undefined && id !== null) {
+                            eliminarNoServidor(id);
+                        } else {
+                            console.error("Erro: ID do cliente não encontrado.");
+                        }
                     }
-                    document.body.removeChild(overlay);
-                };
-
-                overlay.querySelector('#btn-cancelar').onclick = () => document.body.removeChild(overlay);
+                );
             });
         }
     }
