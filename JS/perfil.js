@@ -45,7 +45,7 @@ async function carregarPerfil() {
 
     const photo = user.photo && user.photo.trim() !== ""
         ? user.photo
-        : "images/default-avatar.png";
+        : `https://ui-avatars.com/api/?name=${user.firstName || user.username}+${user.lastName || ""}&background=1e2a78&color=fff`;
 
     // Atualiza foto do perfil
     document.getElementById("fotoPerfil").src = photo;

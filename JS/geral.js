@@ -38,7 +38,7 @@ async function carregarFotoHeader() {
 
         const photo = user.photo && user.photo.trim() !== ""
             ? user.photo
-            : "images/default-avatar.png";
+            : `https://ui-avatars.com/api/?name=${user.firstName || user.username}+${user.lastName || ""}&background=1e2a78&color=fff`;
 
         headerFoto.src = photo;
         localStorage.setItem("userPhoto", photo);
