@@ -61,7 +61,7 @@ async function guardarLeadNoServidor() {
     const leadData = {
         title: inputTitulo,           // Mapeia para String title no Java
         description: inputDesc,       // Mapeia para String description
-        state: parseInt(inputEstado)  // Mapeia para Integer state
+        state: parseInt(inputEstado) || 0  // Mapeia para Integer state
     };
 
     let url = `${BASE_URL}/${username}/leads/addLead`;
