@@ -1,19 +1,33 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // --- 1. ESTADO E SELEÇÃO DE ELEMENTOS ---
+    const BASE_URL = "http://localhost:8080/lferreira-tpancas-proj2/rest/users";
+    const username = localStorage.getItem("userName");
+
     let cardSendoEditado = null;
 
     const btnAdicionar = document.getElementById('btn-adicionar');
     const btnCancelar = document.getElementById('cancelar');
     const formContainer = document.getElementById('form-container');
     const formCliente = document.getElementById('form-cliente');
+    
 
-    // --- 2. INICIALIZAÇÃO ---
+    // --- 1. INICIALIZAÇÃO ---
     carregarListaClientes();
+
+    // --- 2. CABEÇALHOS DE SEGURANÇA ---  esta funcao e geral para outros ficheiros do codigo pode ser reutilizada
+    function getAuthHeaders() {
+        return {
+            "Content-Type": "application/json",
+            "username": localStorage.getItem("userName"),
+            "password": localStorage.getItem("userPass")
+        };
+    }
 
     // --- 3. EVENTOS PRINCIPAIS ---
     if (btnAdicionar) {
         btnAdicionar.addEventListener('click', () => {
+            cardSendoEditado = null;
+            formCliente.reset();
             formContainer.classList.remove('hidden');
         });
     }
@@ -22,28 +36,81 @@ document.addEventListener("DOMContentLoaded", function () {
         btnCancelar.addEventListener('click', fecharFormulario);
     }
 
-    formCliente.addEventListener('submit', (enviar) => {
+    formCliente.addEventListener('submit', async (enviar) => {
         enviar.preventDefault();
 
-        let id = Date.now();
+        // Mapeamento para os nomes exatos do ClientesPojo.java
+        const clienteData = {
+            nome: document.getElementById('nome-cliente').value,
+            email: document.getElementById('email-cliente').value,
+            telefone: document.getElementById('telefone-cliente').value,
+            organizacao: document.getElementById('organizacao-cliente').value
+        };
 
+        let url = `${BASE_URL}/${username}/clients/addClient`;
+        let metodo = 'POST';
+
+        // Se estivermos a editar, recuperamos o ID do card
         if (cardSendoEditado) {
-            id = cardSendoEditado.querySelector('.val-id').innerText;
-            cardSendoEditado.remove();
-            cardSendoEditado = null;
+            clienteData.id = parseInt(cardSendoEditado.querySelector('.val-id').innerText);
+            url = `${BASE_URL}/${username}/clients/editClient`;
+            metodo = 'PUT';
         }
 
-        const nome = document.getElementById('nome-cliente').value;
-        const email = document.getElementById('email-cliente').value;
-        const telefone = document.getElementById('telefone-cliente').value;
-        const organizacao = document.getElementById('organizacao-cliente').value;
+        try {
+            const response = await fetch(url, {
+                method: metodo,
+                headers: getAuthHeaders(),
+                body: JSON.stringify(clienteData)
+            });
 
-        criarElementoCard(nome, email, telefone, organizacao, id);
-        guardarNoLocalStorage();
-        fecharFormulario();
+            if (response.ok) {
+                fecharFormulario();
+                carregarListaClientes(); // Recarrega a lista do servidor
+            } else {
+                alert("Erro ao comunicar com o servidor.");
+            }
+        } catch (error) {
+            console.error("Erro na submissão:", error);
+        }
     });
 
-    // --- 4. FUNÇÕES DE APOIO ---
+    // --- 4. FUNÇÕES DE API ---
+    async function carregarListaClientes() {
+        try {
+            const response = await fetch(`${BASE_URL}/${username}/clients`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+
+            if (response.ok) {
+                const clientes = await response.json();
+                const listaClientes = document.getElementById('lista-clientes');
+                listaClientes.innerHTML = "";
+                // Usa as chaves do Pojo: nome, email, telefone, organizacao
+                clientes.forEach(c => criarElementoCard(c.nome, c.email, c.telefone, c.organizacao, c.id));
+            }
+        } catch (error) {
+            console.error("Erro ao carregar clientes:", error);
+        }
+    }
+
+    async function eliminarNoServidor(id) {
+        try {
+            const response = await fetch(`${BASE_URL}/${username}/clients/remove?id=${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+
+            if (response.ok) {
+                carregarListaClientes();
+            }
+        } catch (error) {
+            console.error("Erro ao eliminar:", error);
+        }
+    }
+
+    // --- 5. FUNÇÕES DE UI  ---
     function fecharFormulario() {
         formContainer.classList.add('hidden');
         formCliente.reset();
@@ -67,8 +134,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p><strong>Telefone:</strong> <span class="val-tel">${telefone}</span></p>
                 <p class="val-id hidden">${id}</p>
                 <div class="card-actions"> 
-                    <button class="button-edit-objects" aria-label="Editar" data-tooltip="Editar"><i class="fa-solid fa-pen"></i></button>
-                    <button class="button-edit-objects" aria-label="Eliminar" data-tooltip="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    <button class="button-edit-objects btn-editar" aria-label="Editar" data-tooltip="Editar"><i class="fa-solid fa-pen"></i></button>
+                    <button class="button-edit-objects btn-eliminar" aria-label="Eliminar"data-tooltip="Remover"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>`;
 
@@ -77,91 +144,55 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function configurarEventosDoCard(card, nome, email, telefone, organizacao, id) {
+        // Lógica de abrir/fechar o card (Toggle)
         card.addEventListener('click', () => {
             card.classList.toggle('aberto');
             card.classList.toggle('fechado');
         });
 
-        const botoes = card.querySelectorAll('.button-edit-objects');
+        
+        // Seleção semântica (por classe específica)
+        const btnEditar = card.querySelector('.btn-editar');
+        const btnEliminar = card.querySelector('.btn-eliminar');
 
         // Botão Editar
-        botoes[0].addEventListener('click', (e) => {
-            e.stopPropagation();
-            cardSendoEditado = card;
-            document.getElementById('nome-cliente').value = nome;
-            document.getElementById('email-cliente').value = email;
-            document.getElementById('telefone-cliente').value = telefone;
-            document.getElementById('organizacao-cliente').value = organizacao;
-            formContainer.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        if (btnEditar) {
+            btnEditar.addEventListener('click', (e) => {
+                e.stopPropagation(); // Impede o card de fechar/abrir ao clicar no botão
+                cardSendoEditado = card;
+                document.getElementById('nome-cliente').value = nome;
+                document.getElementById('email-cliente').value = email;
+                document.getElementById('telefone-cliente').value = telefone;
+                document.getElementById('organizacao-cliente').value = organizacao;
+                formContainer.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
 
         // Botão Eliminar
-        botoes[1].addEventListener('click', (e) => {
-            e.stopPropagation();
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
+        if (btnEliminar) {
+            btnEliminar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
                 <div class="modal-box">
                     <h3>Confirmar Exclusão</h3>
                     <p>Tem a certeza de que deseja apagar o cliente <strong>${organizacao}</strong>?</p>
                     <div class="modal-buttons">
-                        <button id="btn-confirmar" class="btn-acao" >Sim, Apagar</button>
-                        <button id="btn-cancelar" class="btn-acao">Cancelar</button>
+                        <button id="btn-confirmar" >Sim, Apagar</button>
+                        <button id="btn-cancelar" >Cancelar</button>
                     </div>
                 </div>`;
-            document.body.appendChild(overlay);
+                document.body.appendChild(overlay);
 
-            overlay.querySelector('#btn-confirmar').addEventListener('click', () => {
-                card.remove();
-                guardarNoLocalStorage();
-                document.body.removeChild(overlay);
+                overlay.querySelector('#btn-confirmar').onclick = () => {
+                    eliminarNoServidor(id);
+                    document.body.removeChild(overlay);
+                };
+
+                overlay.querySelector('#btn-cancelar').onclick = () => document.body.removeChild(overlay);
             });
-
-            overlay.querySelector('#btn-cancelar').addEventListener('click', () => {
-                document.body.removeChild(overlay);
-            });
-        });
-    }
-
-    function guardarNoLocalStorage() {
-        const cards = document.querySelectorAll('.clientes-card');
-        const listaParaGuardar = [];
-        cards.forEach(card => {
-            listaParaGuardar.push({
-                nome: card.querySelector('.val-nome').innerText,
-                email: card.querySelector('.val-email').innerText,
-                telefone: card.querySelector('.val-tel').innerText,
-                organizacao: card.querySelector('.org-name').innerText,
-                id: card.querySelector('.val-id').innerText
-            });
-        });
-        localStorage.setItem('meusClientes', JSON.stringify(listaParaGuardar));
-    }
-
-    async function carregarListaClientes() {
-        const username = localStorage.getItem("userName");
-        const password = localStorage.getItem("password");
-
-        try {
-            const response = await fetch(`http://localhost:8080/lferreira-tpancas-proj2/rest/users/${username}/clients`, {
-                method: 'GET',
-                headers: {
-                    'username': username,
-                    'password': password,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                const clientes = await response.json();
-                const listaClientes = document.getElementById('lista-clientes');
-                listaClientes.innerHTML = "";
-                clientes.forEach(c => criarElementoCard(c.nome_responsavel, c.email, c.telefone, c.organizacao, c.id));
-            }
-        } catch (error) {
-            console.error("Erro ao carregar clientes:", error);
         }
     }
-
 });
