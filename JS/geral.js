@@ -48,6 +48,14 @@ async function carregarFotoHeader() {
     }
 }
 
+  function getAuthHeaders() {
+        return {
+            "Content-Type": "application/json",
+            "username": localStorage.getItem("userName"),
+            "password": localStorage.getItem("userPass")
+        };
+    }
+
 function inicializarMenuUtilizador() {
 
     const foto = document.getElementById("header-foto");
@@ -120,21 +128,9 @@ function abrirModalConfirmacao(mensagem, acaoConfirmar) {
     overlay.querySelector('#btn-cancelar').onclick = () => {
         document.body.removeChild(overlay);
     };
-}
-
-
-// 2. Lógica do botão de confirmar
-document.getElementById('btn-confirmar').onclick = function () {
-    projetos.splice(index, 1);
-    localStorage.setItem('box-lista', JSON.stringify(projetos));
-    document.body.removeChild(overlay); // Remove o modal
-    renderizarTabela(); // Atualiza a lista
 };
 
-// 3. Lógica do botão de cancelar
-document.getElementById('btn-cancelar').onclick = function () {
-    document.body.removeChild(overlay); // Apenas fecha o modal
-};
+
 
 
 function getIdCliente(id) {

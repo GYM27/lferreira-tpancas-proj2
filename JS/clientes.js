@@ -13,15 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- 1. INICIALIZAÇÃO ---
     carregarListaClientes();
+    console.log("Iniciando carregamento de clientes...");
 
-    // --- 2. CABEÇALHOS DE SEGURANÇA ---  esta funcao e geral para outros ficheiros do codigo pode ser reutilizada
-    function getAuthHeaders() {
-        return {
-            "Content-Type": "application/json",
-            "username": localStorage.getItem("userName"),
-            "password": localStorage.getItem("userPass")
-        };
-    }
+  
 
     // --- 3. EVENTOS PRINCIPAIS ---
     if (btnAdicionar) {
