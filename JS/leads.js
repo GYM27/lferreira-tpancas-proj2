@@ -136,6 +136,8 @@ function renderizarLista() {
     filtradas.forEach(lead => {
         const tr = document.createElement("tr");
 
+        const dataFormatada = lead.date ? new Date(lead.date).toLocaleDateString('pt-PT') : "---";
+
         // Tradução do número para texto usando o objeto mapeamentoEstados
         const textoEstado = mapeamentoEstados[lead.state] || "Desconhecido";
 
@@ -143,6 +145,7 @@ function renderizarLista() {
             <td>${lead.title}</td> 
             <td>${lead.description}</td>
             <td><span class="status-badge">${textoEstado}</span></td>
+            <td>${dataFormatada}</td>
             <td>
                 <button class="button-edit-objects btn-editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
                 <button class="button-edit-objects btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
