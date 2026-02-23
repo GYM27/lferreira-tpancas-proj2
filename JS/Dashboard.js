@@ -51,7 +51,7 @@ async function carregarDadosDoServidor() {
 }
 
 function atualizarDashboard() {
-    // Filtros baseados em identificadores numéricos (STATE_ID) conforme o enunciado [cite: 77, 181]
+    // Filtros baseados em identificadores numéricos (STATE_ID)
     // Exemplo: 1=Novo, 2=Em Análise, 3=Proposta, 4=Ganho, 5=Perdido
     const novos = leadList.filter(l => l.state === 1).length;
     const analise = leadList.filter(l => l.state === 2).length;

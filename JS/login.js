@@ -96,7 +96,7 @@ async function fazerLogin() {
         );
 
         if (response.ok) {
-            //Guardamos apenas o username
+           
             localStorage.setItem("userName", nome);
             localStorage.setItem("userPass", senha);
 
@@ -123,6 +123,7 @@ async function fazerRegisto() {
         cellphone: document.getElementById("reg-phone").value.trim()
     };
 
+    //valida se deixarmos campos vazios avisa utilizador para preencher
     if (Object.values(dadosRegisto).some(v => v === "")) {
         alert("Preencha todos os campos.");
         return;
@@ -139,7 +140,7 @@ async function fazerRegisto() {
         );
 
         if (response.ok) {
-            //Guardamos apenas o username
+           
             localStorage.setItem("userName", dadosRegisto.username);
             localStorage.setItem("userPass", dadosRegisto.password);
 

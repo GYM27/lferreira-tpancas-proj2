@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // Botão Eliminar
+        
         // Botão Eliminar
         if (btnEliminar) {
             btnEliminar.addEventListener('click', (e) => {
