@@ -68,6 +68,7 @@ async function guardarLeadNoServidor() {
     const inputTitulo = document.getElementById("titulo").value;
     const inputDesc = document.getElementById("descricao").value;
     const inputEstado = document.getElementById("estado").value;
+    const inputData = document.getElementById("data") ? document.getElementById("data").value : null;
 
     if (!inputTitulo || !inputDesc) {
         alert("Por favor, preencha o título e a descrição.");
@@ -78,6 +79,7 @@ async function guardarLeadNoServidor() {
         title: inputTitulo,           // Mapeia para String title no Java
         description: inputDesc,       // Mapeia para String description
         state: parseInt(inputEstado) || 0  // Mapeia para Integer state
+        
     };
 
     let url = `${BASE_URL}/${username}/leads/addLead`;
@@ -87,6 +89,13 @@ async function guardarLeadNoServidor() {
         leadData.id = idEmEdicao;
         url = `${BASE_URL}/${username}/leads/editLead`;
         metodo = "PUT";
+
+        // Se estivermos a editar e não houver input de data no form, 
+        // devemos recuperar a data da lead original na lista para não a perder
+        if (!inputData) {
+            const leadOriginal = leadList.find(l => l.id === idEmEdicao);
+            if (leadOriginal) leadData.date = leadOriginal.date;
+        }
     }
 
     try {
@@ -109,7 +118,7 @@ async function guardarLeadNoServidor() {
 
 // ELIMINAR (DELETE)
 async function eliminarLeadNoServidor(id) {
-    
+
     try {
         const response = await fetch(`${BASE_URL}/${username}/leads/remove?id=${id}`, {
             method: "DELETE",
@@ -190,6 +199,12 @@ function prepararEdicao(lead) {
     document.getElementById("titulo").value = lead.title;
     document.getElementById("descricao").value = lead.description;
     document.getElementById("estado").value = lead.state;
+
+   const campoData = document.getElementById("data");
+    if (campoData) {
+        // Se a data vier como "2023-10-27T10:00:00", extrai apenas "2023-10-27"
+        campoData.value = lead.date ? lead.date.split('T')[0] : "";
+    }
 
     document.querySelector("#formLead h3").innerText = "Editar Lead";
     document.getElementById("formLead").classList.remove("form-hidden");
