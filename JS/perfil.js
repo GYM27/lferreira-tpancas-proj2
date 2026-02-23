@@ -60,16 +60,17 @@ async function carregarPerfil() {
     }
 }
 
-
-//Atualizar perfil
+// Atualizar perfil
 async function atualizarPerfil(event) {
-
     event.preventDefault();
 
     const username = localStorage.getItem("userName");
+    // Recuperamos a senha antiga que está guardada no localstorage para comparar
+    const senhaAntiga = localStorage.getItem("userPass");
+    const novaPassword = document.getElementById("password").value;
 
     const dadosAtualizados = {
-        password: document.getElementById("password").value,
+        password: novaPassword,
         email: document.getElementById("email").value,
         firstName: document.getElementById("firstName").value,
         lastName: document.getElementById("lastName").value,
@@ -84,10 +85,19 @@ async function atualizarPerfil(event) {
     });
 
     if (response.ok) {
-        alert("Perfil atualizado com sucesso!");
-        window.location.href = "Dashboard.html";
+        // A verificação só acontece se o servidor aceitou as mudanças
+
+        if (novaPassword !== senhaAntiga) {
+            alert("Senha alterada! Por segurança, faça login novamente.");
+            localStorage.clear();
+            window.location.href = "Login.html";
+        } else {
+            alert("Dados atualizados com sucesso!");
+            // Se não mudou a senha, apenas atualizamos os outros dados se necessário
+            window.location.href = "Dashboard.html";
+        }
     } else {
-        alert("Erro ao atualizar perfil.");
+        alert("Erro ao atualizar perfil no servidor.");
     }
 }
 
